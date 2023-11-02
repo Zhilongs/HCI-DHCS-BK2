@@ -15,6 +15,11 @@ boolean userDone = false; //is the user done
 final int screenPPI = 72; //what is the DPI of the screen you are using
 //you can test this by drawing a 72x72 pixel rectangle in code, and then confirming with a ruler it is 1x1 inch. 
 
+// mouse dragging variables
+boolean dragging = false;
+float prevMouseX, prevMouseY;
+
+
 //These variables are for my example design. Your input code should modify/replace these!
 float logoX = 500;
 float logoY = 500;
@@ -104,6 +109,15 @@ void draw() {
   fill(255);
   scaffoldControlLogic(); //you are going to want to replace this!
   text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchToPix(.8f));
+  // Check if we're dragging the "logo"
+  if (dragging) {
+    logoX += mouseX - prevMouseX;
+    logoY += mouseY - prevMouseY;
+    
+    // Update previous mouse positions
+    prevMouseX = mouseX;
+    prevMouseY = mouseY;
+  }
 }
 
 //my example design for control, which is terrible
@@ -154,6 +168,13 @@ void mousePressed()
     startTime = millis();
     println("time started!");
   }
+  
+  // Check if the mouse is inside the "logo" rectangle upon pressing
+  if (dist(mouseX, mouseY, logoX, logoY) < logoZ / 2) {
+    dragging = true;
+    prevMouseX = mouseX;
+    prevMouseY = mouseY;
+  }
 }
 
 void mouseReleased()
@@ -172,6 +193,7 @@ void mouseReleased()
       finishTime = millis();
     }
   }
+  dragging = false;
 }
 
 //probably shouldn't modify this, but email me if you want to for some good reason.
