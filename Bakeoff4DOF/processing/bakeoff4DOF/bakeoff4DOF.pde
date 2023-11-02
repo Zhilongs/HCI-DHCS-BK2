@@ -12,6 +12,14 @@ int startTime = 0; // time starts when the first click is captured
 int finishTime = 0; //records the time of the final click
 boolean userDone = false; //is the user done
 
+//slider vairiables
+float sliderX; // Slider x
+float sliderY; // Slider y
+float sliderHeight; // Slider height
+float sliderKnobY; // Slider knob y
+boolean sliderDragging = false; // 
+
+
 final int screenPPI = 72; //what is the DPI of the screen you are using
 //you can test this by drawing a 72x72 pixel rectangle in code, and then confirming with a ruler it is 1x1 inch. 
 
@@ -54,9 +62,20 @@ void setup() {
   }
 
   Collections.shuffle(destinations); // randomize the order of the button; don't change this.
+  
+  // Slider initialization
+  sliderX = width- border;
+  sliderY = border;
+  sliderHeight = height -2*border;
+  sliderKnobY = height/2;
 }
 
-
+void drawSlider(){
+  fill(128);
+  rect(sliderX, sliderY + sliderHeight/2, inchToPix(0.1f), sliderHeight); // Slider background
+  fill(255);
+  rect(sliderX, sliderKnobY, inchToPix(0.2f), inchToPix(0.4f)); // Slider button
+}
 
 void draw() {
 
@@ -104,6 +123,7 @@ void draw() {
   fill(255);
   scaffoldControlLogic(); //you are going to want to replace this!
   text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchToPix(.8f));
+  drawSlider();
 }
 
 //my example design for control, which is terrible
@@ -154,8 +174,27 @@ void mousePressed()
     startTime = millis();
     println("time started!");
   }
+  // if click on the slider
+  if (dist(mouseX, mouseY, sliderX, sliderKnobY) < inchToPix(0.4f)) {
+    sliderDragging = true;
+  }
+}
+void mouseDragged() {
+  if (sliderDragging) {
+    // Update nob position basing on with mouse action
+    sliderKnobY = constrain(mouseY, sliderY, sliderY + sliderHeight);
+    // update logo rotation value 
+    logoRotation = map(sliderKnobY, sliderY, sliderY + sliderHeight, 0, 360);
+  }
 }
 
+// using mousewheel to update the rotation
+void mouseWheel(MouseEvent event){
+    float e = event.getCount();
+    sliderKnobY += e * inchToPix(0.1f); 
+    sliderKnobY = constrain(sliderKnobY, sliderY, sliderY + sliderHeight);
+    logoRotation = map(sliderKnobY, sliderY, sliderY + sliderHeight, 0, 360);
+}
 void mouseReleased()
 {
   //check to see if user clicked middle of screen within 3 inches, which this code uses as a submit button
@@ -172,6 +211,7 @@ void mouseReleased()
       finishTime = millis();
     }
   }
+  sliderDragging = false;
 }
 
 //probably shouldn't modify this, but email me if you want to for some good reason.
