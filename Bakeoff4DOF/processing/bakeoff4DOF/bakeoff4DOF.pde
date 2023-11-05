@@ -15,6 +15,8 @@ boolean userDone = false; //is the user done
 final int screenPPI = 72; //what is the DPI of the screen you are using
 //you can test this by drawing a 72x72 pixel rectangle in code, and then confirming with a ruler it is 1x1 inch. 
 
+float destinationRotation;
+float currentRotation;
 
 //Knob rotate initialization
 boolean rotating  = false;
@@ -63,10 +65,19 @@ void setup() {
 }
 
 // knob draw function
-void drawKnob(float x, float y, float diameter) {
+void drawKnob(float x, float y, float diameter,float currentRotation, float destinationRotation) {
   pushMatrix();
   translate(x, y);
-  stroke(255);
+  // Calculate the difference between the current rotation and the target
+  double rotationDifference = calculateDifferenceBetweenAngles(currentRotation, destinationRotation);
+  float tolerance = 5; // degrees within which the knob should turn green
+
+  // Set the color based on how close the current rotation is to the target
+  if (rotationDifference <= tolerance) {
+    stroke(0, 255, 0); // Green color
+  } else {
+    stroke(255); // White color
+  }
   noFill();
   ellipse(0, 0, diameter, diameter); 
   
@@ -122,7 +133,11 @@ void draw() {
   scaffoldControlLogic(); //you are going to want to replace this!
   text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchToPix(.8f));
   
-  drawKnob(width * 0.5, height-border,50);
+  if (trialIndex < destinations.size()) {
+    Destination currentDestination = destinations.get(trialIndex);
+    destinationRotation = currentDestination.rotation;
+  }
+  drawKnob(width * 0.5, height-border, 50, logoRotation, destinationRotation);
   
   if (rotating) {
     float currentAngle = atan2(mouseY - height+border, mouseX - width * 0.5);
