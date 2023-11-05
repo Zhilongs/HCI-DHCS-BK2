@@ -15,6 +15,12 @@ boolean userDone = false; //is the user done
 final int screenPPI = 72; //what is the DPI of the screen you are using
 //you can test this by drawing a 72x72 pixel rectangle in code, and then confirming with a ruler it is 1x1 inch. 
 
+
+//Knob rotate initialization
+boolean rotating  = false;
+float lastAngle = 0;
+float deltaAngle = 0;
+
 //These variables are for my example design. Your input code should modify/replace these!
 float logoX = 500;
 float logoY = 500;
@@ -56,7 +62,18 @@ void setup() {
   Collections.shuffle(destinations); // randomize the order of the button; don't change this.
 }
 
-
+// knob draw function
+void drawKnob(float x, float y, float diameter) {
+  pushMatrix();
+  translate(x, y);
+  stroke(255);
+  noFill();
+  ellipse(0, 0, diameter, diameter); 
+  
+  rotate(lastAngle);
+  line(0, 0, diameter/2, 0);
+  popMatrix();
+}
 
 void draw() {
 
@@ -104,6 +121,15 @@ void draw() {
   fill(255);
   scaffoldControlLogic(); //you are going to want to replace this!
   text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchToPix(.8f));
+  
+  drawKnob(width * 0.5, height-border,50);
+  
+  if (rotating) {
+    float currentAngle = atan2(mouseY - height+border, mouseX - width * 0.5);
+    deltaAngle = currentAngle - lastAngle;
+    lastAngle = currentAngle;
+    logoRotation += degrees(deltaAngle);
+  }
 }
 
 //my example design for control, which is terrible
@@ -154,6 +180,11 @@ void mousePressed()
     startTime = millis();
     println("time started!");
   }
+  float d = dist(mouseX, mouseY, width * 0.5, height-border);
+  if (d < 50) {
+    rotating = true;
+    lastAngle = atan2(mouseY - height+border, mouseX - width * 0.5);
+  }
 }
 
 void mouseReleased()
@@ -172,6 +203,7 @@ void mouseReleased()
       finishTime = millis();
     }
   }
+  rotating = false;
 }
 
 //probably shouldn't modify this, but email me if you want to for some good reason.
