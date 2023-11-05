@@ -71,10 +71,22 @@ void setup() {
 }
 
 void drawSlider(){
+  Destination currentDest = destinations.get(trialIndex);
+  
   fill(128);
   rect(sliderX, sliderY + sliderHeight/2, inchToPix(0.1f), sliderHeight); // Slider background
-  fill(255);
-  rect(sliderX, sliderKnobY, inchToPix(0.2f), inchToPix(0.4f)); // Slider button
+  float difference = abs(logoZ - currentDest.z);
+  
+  if(difference < inchToPix(0.1f)) { // Within boundary turn green
+    fill(0, 255, 0);
+  } else if(difference < inchToPix(0.2f)) { // +- 0.2 f turn yellow
+    fill(255, 255, 0);
+  } else { // larger difference is red
+    fill(255, 0, 0);
+  }
+
+  // 绘制滑块柄
+  rect(sliderX, sliderKnobY, inchToPix(0.2f), inchToPix(0.4f)); 
 }
 
 void draw() {
@@ -184,17 +196,11 @@ void mouseDragged() {
     // Update nob position basing on with mouse action
     sliderKnobY = constrain(mouseY, sliderY, sliderY + sliderHeight);
     // update logo rotation value 
-    logoRotation = map(sliderKnobY, sliderY, sliderY + sliderHeight, 0, 360);
+    logoZ = map(sliderKnobY, sliderY, sliderY + sliderHeight,inchToPix(3f),inchToPix(0.25f));
   }
 }
 
-// using mousewheel to update the rotation
-void mouseWheel(MouseEvent event){
-    float e = event.getCount();
-    sliderKnobY += e * inchToPix(0.1f); 
-    sliderKnobY = constrain(sliderKnobY, sliderY, sliderY + sliderHeight);
-    logoRotation = map(sliderKnobY, sliderY, sliderY + sliderHeight, 0, 360);
-}
+
 void mouseReleased()
 {
   //check to see if user clicked middle of screen within 3 inches, which this code uses as a submit button
