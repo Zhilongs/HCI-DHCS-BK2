@@ -109,41 +109,84 @@ void draw() {
 //my example design for control, which is terrible
 void scaffoldControlLogic()
 {
-  //upper left corner, rotate counterclockwise
-  text("CCW", inchToPix(.4f), inchToPix(.4f));
-  if (mousePressed && dist(0, 0, mouseX, mouseY)<inchToPix(.8f))
+  float controlAreaCenterX = width/2; // Center X for the controls area
+  float controlAreaY = height - inchToPix(1f); // Y position for all controls, set to near the bottom of the screen
+  float controlSpacing = inchToPix(1f); // Space between each control
+  
+  // Control positions
+  float ccwX = controlAreaCenterX - controlSpacing * 2; // Counterclockwise button X position
+  float cwX = controlAreaCenterX + controlSpacing * 2; // Clockwise button X position
+  
+  float minusX = controlAreaCenterX - controlSpacing; // Decrease Z button X position
+  float plusX = controlAreaCenterX + controlSpacing; // Increase Z button X position
+  
+  float leftX = controlAreaCenterX - controlSpacing * 3; // Move left button X position
+  float rightX = controlAreaCenterX + controlSpacing * 3; // Move right button X position
+  
+  float upY = controlAreaY - controlSpacing; // Move up button Y position
+  float downY = controlAreaY + controlSpacing; // Move down button Y position
+
+  float buttonWidth = inchToPix(0.8f);  // 假设按钮的宽度
+  float buttonHeight = inchToPix(0.6f); // 假设按钮的高度
+  // Rotate counterclockwise button
+  fill(128); 
+  rect(ccwX , controlAreaY , buttonWidth, buttonHeight);
+  fill(0); 
+  text("CCW", ccwX, controlAreaY);
+  if (mousePressed && dist(ccwX, controlAreaY, mouseX, mouseY)<inchToPix(.4f))
     logoRotation--;
 
-  //upper right corner, rotate clockwise
-  text("CW", width-inchToPix(.4f), inchToPix(.4f));
-  if (mousePressed && dist(width, 0, mouseX, mouseY)<inchToPix(.8f))
+  // Rotate clockwise button
+  fill(128); 
+  rect(cwX , controlAreaY , buttonWidth, buttonHeight);
+  fill(0); 
+  text("CW", cwX, controlAreaY);
+  if (mousePressed && dist(cwX, controlAreaY, mouseX, mouseY)<inchToPix(.4f))
     logoRotation++;
 
-  //lower left corner, decrease Z
-  text("-", inchToPix(.4f), height-inchToPix(.4f));
-  if (mousePressed && dist(0, height, mouseX, mouseY)<inchToPix(.8f))
+  // Decrease Z button
+  fill(128); 
+  rect(minusX , controlAreaY , buttonWidth, buttonHeight);
+  fill(0); 
+  text("-", minusX, controlAreaY);
+  if (mousePressed && dist(minusX, controlAreaY, mouseX, mouseY)<inchToPix(.4f))
     logoZ = constrain(logoZ-inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone!
 
-  //lower right corner, increase Z
-  text("+", width-inchToPix(.4f), height-inchToPix(.4f));
-  if (mousePressed && dist(width, height, mouseX, mouseY)<inchToPix(.8f))
+  // Increase Z button
+  fill(128); 
+  rect(plusX , controlAreaY , buttonWidth, buttonHeight);
+  fill(0); 
+  text("+", plusX, controlAreaY);
+  if (mousePressed && dist(plusX, controlAreaY, mouseX, mouseY)<inchToPix(.4f))
     logoZ = constrain(logoZ+inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone! 
 
-  //left middle, move left
-  text("left", inchToPix(.4f), height/2);
-  if (mousePressed && dist(0, height/2, mouseX, mouseY)<inchToPix(.8f))
+  // Move left button
+  fill(128); 
+  rect(leftX , controlAreaY , buttonWidth, buttonHeight);
+  fill(0);
+  text("left", leftX, controlAreaY);
+  if (mousePressed && dist(leftX, controlAreaY, mouseX, mouseY)<inchToPix(.4f))
     logoX-=inchToPix(.02f);
 
-  text("right", width-inchToPix(.4f), height/2);
-  if (mousePressed && dist(width, height/2, mouseX, mouseY)<inchToPix(.8f))
+  // Move right button
+  fill(128); 
+  rect(rightX, controlAreaY , buttonWidth, buttonHeight);
+  fill(0);
+  text("right", rightX, controlAreaY);
+  if (mousePressed && dist(rightX, controlAreaY, mouseX, mouseY)<inchToPix(.4f))
     logoX+=inchToPix(.02f);
 
-  text("up", width/2, inchToPix(.4f));
-  if (mousePressed && dist(width/2, 0, mouseX, mouseY)<inchToPix(.8f))
+  // Move up button, positioned above the CCW and "-" buttons
+  fill(128); 
+  rect(controlAreaCenterX, controlAreaY , buttonWidth, buttonHeight);
+  fill(0);
+  text("up", controlAreaCenterX, upY);
+  if (mousePressed && dist(controlAreaCenterX, upY, mouseX, mouseY)<inchToPix(.4f))
     logoY-=inchToPix(.02f);
 
-  text("down", width/2, height-inchToPix(.4f));
-  if (mousePressed && dist(width/2, height, mouseX, mouseY)<inchToPix(.8f))
+  // Move down button, positioned below the CW and "+" buttons
+  text("down", controlAreaCenterX, downY);
+  if (mousePressed && dist(controlAreaCenterX, downY, mouseX, mouseY)<inchToPix(.4f))
     logoY+=inchToPix(.02f);
 }
 
