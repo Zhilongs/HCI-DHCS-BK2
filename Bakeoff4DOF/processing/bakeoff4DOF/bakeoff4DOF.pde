@@ -120,7 +120,7 @@ void draw() {
   }
 }
 
-//my example design for control, which is terrible
+//
 void scaffoldControlLogic()
 {
   float controlAreaCenterX = width/2; // Center X for the controls area
@@ -140,8 +140,8 @@ void scaffoldControlLogic()
   float upY = controlAreaY - controlSpacing; // Move up button Y position
   float downY = controlAreaY + controlSpacing; // Move down button Y position
 
-  float buttonWidth = inchToPix(0.8f);  // 假设按钮的宽度
-  float buttonHeight = inchToPix(0.6f); // 假设按钮的高度
+  float buttonWidth = inchToPix(0.8f);  //
+  float buttonHeight = inchToPix(0.6f); //
   // Rotate counterclockwise button
   fill(128); 
   rect(ccwX , controlAreaY , buttonWidth, buttonHeight);
@@ -192,13 +192,16 @@ void scaffoldControlLogic()
 
   // Move up button, positioned above the CCW and "-" buttons
   fill(128); 
-  rect(controlAreaCenterX, controlAreaY , buttonWidth, buttonHeight);
+  rect(controlAreaCenterX, upY , buttonWidth, buttonHeight);
   fill(0);
   text("up", controlAreaCenterX, upY);
   if (mousePressed && dist(controlAreaCenterX, upY, mouseX, mouseY)<inchToPix(.4f))
     logoY-=inchToPix(.02f);
 
   // Move down button, positioned below the CW and "+" buttons
+  fill(128); 
+  rect(controlAreaCenterX, downY , buttonWidth, buttonHeight);
+  fill(0);
   text("down", controlAreaCenterX, downY);
   if (mousePressed && dist(controlAreaCenterX, downY, mouseX, mouseY)<inchToPix(.4f))
     logoY+=inchToPix(.02f);
