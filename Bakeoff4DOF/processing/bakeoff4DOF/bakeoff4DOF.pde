@@ -11,6 +11,13 @@ float errorPenalty = 0.5f; //for every error, add this value to mean time
 int startTime = 0; // time starts when the first click is captured
 int finishTime = 0; //records the time of the final click
 boolean userDone = false; //is the user done
+int numClicks = 0;
+float x1 = 0;
+float x2 = 0;
+float y1 = 0;
+float y2 = 0;
+float dx = 0;
+float dy = 0;
 
 final int screenPPI = 72; //what is the DPI of the screen you are using
 //you can test this by drawing a 72x72 pixel rectangle in code, and then confirming with a ruler it is 1x1 inch. 
@@ -94,7 +101,7 @@ void draw() {
   //===========DRAW LOGO SQUARE=================
   pushMatrix();
   translate(logoX, logoY); //translate draw center to the center oft he logo square
-  rotate(radians(logoRotation)); //rotate using the logo square as the origin
+  rotate(logoRotation); //rotate using the logo square as the origin
   noStroke();
   fill(60, 60, 192, 192);
   rect(0, 0, logoZ, logoZ);
@@ -154,12 +161,29 @@ void mousePressed()
     startTime = millis();
     println("time started!");
   }
+  if (numClicks % 2 == 0) {
+      x1 = mouseX;
+      y1 = mouseY;
+      numClicks++;
+  }
+  else {
+      x2 = mouseX;
+      y2 = mouseY;
+      numClicks++;
+      logoX = ((x2-x1)/2) + x1;
+      logoY = ((y2-y1)/2) + y1;
+      logoZ = sqrt(sq(y2-y1) + sq(x2-x1))/sqrt(2);
+      dx = abs(x2 - x1);
+      dy = abs(y2 - y1);
+      logoRotation = atan2(dy, dx)+QUARTER_PI;
+      println(atan(abs((y2-y1)/(x2-x1))));
+  }
 }
 
 void mouseReleased()
 {
   //check to see if user clicked middle of screen within 3 inches, which this code uses as a submit button
-  if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(3f))
+  if (dist(width, height, mouseX, mouseY)<inchToPix(1f))
   {
     if (userDone==false && !checkForSuccess())
       errorCount++;
@@ -177,10 +201,10 @@ void mouseReleased()
 //probably shouldn't modify this, but email me if you want to for some good reason.
 public boolean checkForSuccess()
 {
-  Destination d = destinations.get(trialIndex);	
+  Destination d = destinations.get(trialIndex);  
   boolean closeDist = dist(d.x, d.y, logoX, logoY)<inchToPix(.05f); //has to be within +-0.05"
   boolean closeRotation = calculateDifferenceBetweenAngles(d.rotation, logoRotation)<=5;
-  boolean closeZ = abs(d.z - logoZ)<inchToPix(.1f); //has to be within +-0.1"	
+  boolean closeZ = abs(d.z - logoZ)<inchToPix(.1f); //has to be within +-0.1"  
 
   println("Close Enough Distance: " + closeDist + " (logo X/Y = " + d.x + "/" + d.y + ", destination X/Y = " + logoX + "/" + logoY +")");
   println("Close Enough Rotation: " + closeRotation + " (rot dist="+calculateDifferenceBetweenAngles(d.rotation, logoRotation)+")");
