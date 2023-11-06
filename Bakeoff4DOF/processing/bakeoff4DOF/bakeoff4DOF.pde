@@ -190,7 +190,7 @@ void submit() {
   if (userDone == false && !checkForSuccess())
     errorCount++;
 
-  trialIndex++; // 移动到下一个试验
+  trialIndex++; //
 
   if (trialIndex == trialCount && userDone == false) {
     userDone = true;
