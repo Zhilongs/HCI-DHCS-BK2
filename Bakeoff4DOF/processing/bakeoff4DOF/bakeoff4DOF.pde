@@ -150,6 +150,7 @@ void mousePressed()
 {
   submitButtonX = width * 0.95;
   submitButtonY = height * 0.9;
+  submitButtonWidth = inchToPix(1.0f);
   submitButtonHeight = inchToPix(0.5f);
   if (startTime == 0) //start time on the instant of the first user click
   {
@@ -172,20 +173,18 @@ void mousePressed()
       dy = abs(y2 - y1);
       logoRotation = atan2(dy, dx)-QUARTER_PI;
   }
+  else if (inSubmit()) {
       submit();
   }
 }
-
 Boolean inSubmit() 
 {
-  if (mouseX > submitButtonX-submitButtonWidth/2 - 10  && mouseX < submitButtonX + submitButtonWidth/2 &&
-      mouseY > submitButtonY-submitButtonHeight/2 - 10  && mouseY < submitButtonY + submitButtonHeight/2 + 10) {
+  if (dist(submitButtonX-40, submitButtonY-20, mouseX, mouseY)<inchToPix(.4f)) {
       return true;
   }
   return false;
 }
 
-{
 void submit() {
   if (userDone == false && !checkForSuccess()){
     errorCount++;
