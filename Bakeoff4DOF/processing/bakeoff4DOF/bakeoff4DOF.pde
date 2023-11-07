@@ -126,6 +126,16 @@ void drawSubmitButton() {
   float submitButtonWidth = inchToPix(1.0f); 
   float submitButtonHeight = inchToPix(0.5f);
   fill(128);
+  
+  // Check if the mouse is over the button
+  if (mouseX > submitButtonX - submitButtonWidth / 2 -40&& 
+      mouseX < submitButtonX + submitButtonWidth / 2 -40&&
+      mouseY > submitButtonY - submitButtonHeight / 2 -20&& 
+      mouseY < submitButtonY + submitButtonHeight / 2-20) {
+    fill(255, 0, 0); // Highlight color, e.g., red
+  } else {
+    fill(128); // Default button color
+  }
   rect(submitButtonX-submitButtonWidth/2 , submitButtonY-submitButtonHeight/2 , submitButtonWidth, submitButtonHeight);
   
   fill(0);
@@ -138,6 +148,9 @@ void drawSubmitButton() {
 
 void mousePressed()
 {
+  submitButtonX = width * 0.95;
+  submitButtonY = height * 0.9;
+  submitButtonHeight = inchToPix(0.5f);
   if (startTime == 0) //start time on the instant of the first user click
   {
     startTime = millis();
@@ -158,9 +171,7 @@ void mousePressed()
       dx = abs(x2 - x1);
       dy = abs(y2 - y1);
       logoRotation = atan2(dy, dx)-QUARTER_PI;
-      println(atan(abs((y2-y1)/(x2-x1))));
   }
-  if (inSubmit()) {
       submit();
   }
 }
@@ -174,26 +185,13 @@ Boolean inSubmit()
   return false;
 }
 
-void mouseReleased()
 {
-  //check to see if user clicked middle of screen within 3 inches, which this code uses as a submit button
-  //if (dist(width, height, mouseX, mouseY)<inchToPix(1f))
-  //{
-  //  if (userDone==false && !checkForSuccess())
-  //    errorCount++;
-  submitButtonX = width * 0.95;
-  submitButtonY = height * 0.9;
-  submitButtonWidth = inchToPix(1.0f);
-  submitButtonHeight = inchToPix(0.5f);
-  //if (inSubmit()) {
-  //    submit();
-  //}
-}
 void submit() {
-  if (userDone == false && !checkForSuccess())
+  if (userDone == false && !checkForSuccess()){
     errorCount++;
+    }
     trialIndex++; //and move on to next trial
-
+  
     if (trialIndex==trialCount && userDone==false)
     {
       userDone = true;
