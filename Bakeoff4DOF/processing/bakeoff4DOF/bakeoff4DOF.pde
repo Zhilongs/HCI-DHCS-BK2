@@ -105,6 +105,19 @@ void draw() {
   rect(0, 0, logoZ, logoZ);
   popMatrix();
 
+  // Draw Line Between Logo And Target Square
+  Destination currentDest = destinations.get(trialIndex);
+  // Calculate the distance between the logo and the target square center
+  float distance = dist(logoX, logoY, currentDest.x, currentDest.y);
+  // Set the line color based on the distance
+  if (distance < inchToPix(0.05f)) { // Replace 0.05f with your "close enough" distance threshold
+    stroke(0, 255, 0); // Green for close enough
+  } else {
+    stroke(255, 0, 0); // Grey otherwise
+  }
+  // Draw the line
+  line(logoX, logoY, currentDest.x, currentDest.y);
+  
   //===========DRAW EXAMPLE CONTROLS=================
   fill(255);
   scaffoldControlLogic(); //you are going to want to replace this!
