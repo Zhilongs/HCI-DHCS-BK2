@@ -15,6 +15,7 @@ boolean userDone = false; //is the user done
 final int screenPPI = 72; //what is the DPI of the screen you are using
 //you can test this by drawing a 72x72 pixel rectangle in code, and then confirming with a ruler it is 1x1 inch. 
 
+
 float destinationRotation;
 float currentRotation;
 
@@ -22,6 +23,12 @@ float currentRotation;
 boolean rotating  = false;
 float lastAngle = 0;
 float deltaAngle = 0;
+
+// mouse dragging variables
+boolean dragging = false;
+float prevMouseX, prevMouseY;
+
+
 
 //These variables are for my example design. Your input code should modify/replace these!
 float logoX = 500;
@@ -128,10 +135,24 @@ void draw() {
   rect(0, 0, logoZ, logoZ);
   popMatrix();
 
+  // Draw Line Between Logo And Target Square
+  Destination currentDest = destinations.get(trialIndex);
+  // Calculate the distance between the logo and the target square center
+  float distance = dist(logoX, logoY, currentDest.x, currentDest.y);
+  // Set the line color based on the distance
+  if (distance < inchToPix(0.05f)) { // Replace 0.05f with your "close enough" distance threshold
+    stroke(0, 255, 0); // Green for close enough
+  } else {
+    stroke(255, 0, 0); // Grey otherwise
+  }
+  // Draw the line
+  line(logoX, logoY, currentDest.x, currentDest.y);
+  
   //===========DRAW EXAMPLE CONTROLS=================
   fill(255);
   scaffoldControlLogic(); //you are going to want to replace this!
   text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchToPix(.8f));
+
   
   if (trialIndex < destinations.size()) {
     Destination currentDestination = destinations.get(trialIndex);
@@ -144,12 +165,19 @@ void draw() {
     deltaAngle = currentAngle - lastAngle;
     lastAngle = currentAngle;
     logoRotation += degrees(deltaAngle);
+    }
+  // Check if we're dragging the "logo"
+  if (dragging) {
+    logoX += mouseX - prevMouseX;
+    logoY += mouseY - prevMouseY;
+    // Update previous mouse positions
+    prevMouseX = mouseX;
+    prevMouseY = mouseY;
   }
 }
 
 //my example design for control, which is terrible
-void scaffoldControlLogic()
-{
+void scaffoldControlLogic(){
   //upper left corner, rotate counterclockwise
   text("CCW", inchToPix(.4f), inchToPix(.4f));
   if (mousePressed && dist(0, 0, mouseX, mouseY)<inchToPix(.8f))
@@ -195,17 +223,25 @@ void mousePressed()
     startTime = millis();
     println("time started!");
   }
+
   float d = dist(mouseX, mouseY, width * 0.5, height-border);
   if (d < 50) {
     rotating = true;
     lastAngle = atan2(mouseY - height+border, mouseX - width * 0.5);
+  }
+  
+  // Check if the mouse is inside the "logo" rectangle upon pressing
+  if (dist(mouseX, mouseY, logoX, logoY) < logoZ / 2) {
+    dragging = true;
+    prevMouseX = mouseX;
+    prevMouseY = mouseY;
   }
 }
 
 void mouseReleased()
 {
   //check to see if user clicked middle of screen within 3 inches, which this code uses as a submit button
-  if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(3f))
+  if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(0.5f))
   {
     if (userDone==false && !checkForSuccess())
       errorCount++;
@@ -218,8 +254,10 @@ void mouseReleased()
       finishTime = millis();
     }
   }
+
   rotating = false;
-}
+  dragging = false;
+  }
 
 //probably shouldn't modify this, but email me if you want to for some good reason.
 public boolean checkForSuccess()
