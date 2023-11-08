@@ -44,7 +44,7 @@ void setup() {
   rectMode(CENTER); //draw rectangles not from upper left, but from the center outwards
   
   //don't change this! 
-  border = inchToPix(2f); //padding of 1.0 inches
+  border = inchToPix(1f); //padding of 1.0 inches
 
   for (int i=0; i<trialCount; i++) //don't change this! 
   {
@@ -52,12 +52,13 @@ void setup() {
     d.x = random(border, width-border); //set a random x with some padding
     d.y = random(border, height-border); //set a random y with some padding
     d.rotation = random(0, 360); //random rotation between 0 and 360
-    int j = (int)random(20);
-    d.z = ((j%12)+1)*inchToPix(.25f); //increasing size from .25 up to 3.0" 
+    
+    d.z = inchToPix((float)random(1,12)/4.0f); //increasing size from .25" up to 3.0" 
+    
     destinations.add(d);
     println("created target with " + d.x + "," + d.y + "," + d.rotation + "," + d.z);
   }
-
+  
   Collections.shuffle(destinations); // randomize the order of the button; don't change this.
 }
 
@@ -118,6 +119,7 @@ void draw() {
   // Draw the line
   line(logoX, logoY, currentDest.x, currentDest.y);
   
+  stroke(128); // Grey otherwise
   //===========DRAW EXAMPLE CONTROLS=================
   fill(255);
   scaffoldControlLogic(); //you are going to want to replace this!
@@ -239,7 +241,7 @@ void mousePressed()
 void mouseReleased()
 {
   //check to see if user clicked middle of screen within 3 inches, which this code uses as a submit button
-  if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(3f))
+  if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(0.5f))
   {
     if (userDone==false && !checkForSuccess())
       errorCount++;
