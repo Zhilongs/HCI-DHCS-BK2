@@ -193,7 +193,7 @@ void mousePressed()
 void mouseReleased()
 {
   //check to see if user clicked middle of screen within 3 inches, which this code uses as a submit button
-  if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(3f))
+  if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(0.5f))
   {
     if (userDone==false && !checkForSuccess())
       errorCount++;
