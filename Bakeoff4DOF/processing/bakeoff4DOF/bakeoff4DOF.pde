@@ -15,9 +15,25 @@ boolean userDone = false; //is the user done
 final int screenPPI = 72; //what is the DPI of the screen you are using
 //you can test this by drawing a 72x72 pixel rectangle in code, and then confirming with a ruler it is 1x1 inch. 
 
+
+float destinationRotation;
+float currentRotation;
+
+//Knob rotate initialization
+boolean rotating  = false;
+float lastAngle = 0;
+float deltaAngle = 0;
+
 // mouse dragging variables
 boolean dragging = false;
 float prevMouseX, prevMouseY;
+
+//slider vairiables
+float sliderX; // Slider x
+float sliderY; // Slider y
+float sliderHeight; // Slider height
+float sliderKnobY; // Slider knob y
+boolean sliderDragging = false; // 
 
 
 //These variables are for my example design. Your input code should modify/replace these!
@@ -58,11 +74,54 @@ void setup() {
     destinations.add(d);
     println("created target with " + d.x + "," + d.y + "," + d.rotation + "," + d.z);
   }
+
+  Collections.shuffle(destinations); // randomize the order of the button; don't change this.、
   
-  Collections.shuffle(destinations); // randomize the order of the button; don't change this.
+  // Slider initialization
+  sliderX = width- border;
+  sliderY = border;
+  sliderHeight = height -2*border;
+  sliderKnobY = height/2;
 }
 
+void drawSlider(){
+  Destination currentDest = destinations.get(trialIndex);
 
+  fill(128);
+  rect(sliderX, sliderY + sliderHeight/2, inchToPix(0.1f), sliderHeight); // Slider background
+  float difference = abs(logoZ - currentDest.z);
+
+  if(difference < inchToPix(0.1f)) { // Within boundary turn green
+    fill(0, 255, 0);
+  } else if(difference < inchToPix(0.2f)) { // +- 0.2 f turn yellow
+    fill(255, 255, 0);
+  } else { // larger difference is red
+    fill(255, 0, 0);
+  }
+  rect(sliderX, sliderKnobY, inchToPix(0.2f), inchToPix(0.4f)); 
+}
+
+// knob draw function
+void drawKnob(float x, float y, float diameter,float currentRotation, float destinationRotation) {
+  pushMatrix();
+  translate(x, y);
+  // Calculate the difference between the current rotation and the target
+  double rotationDifference = calculateDifferenceBetweenAngles(currentRotation, destinationRotation);
+  float tolerance = 5; // degrees within which the knob should turn green
+
+  // Set the color based on how close the current rotation is to the target
+  if (rotationDifference <= tolerance) {
+    stroke(0, 255, 0); // Green color
+  } else {
+    stroke(255); // White color
+  }
+  noFill();
+  ellipse(0, 0, diameter, diameter); 
+  
+  rotate(lastAngle);
+  line(0, 0, diameter/2, 0);
+  popMatrix();
+}
 
 void draw() {
 
@@ -124,20 +183,32 @@ void draw() {
   fill(255);
   scaffoldControlLogic(); //you are going to want to replace this!
   text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchToPix(.8f));
+  drawSlider();
+  if (trialIndex < destinations.size()) {
+    Destination currentDestination = destinations.get(trialIndex);
+    destinationRotation = currentDestination.rotation;
+  }
+  drawKnob(width * 0.5, height-border, 50, logoRotation, destinationRotation);
+  
+  if (rotating) {
+    float currentAngle = atan2(mouseY - height+border, mouseX - width * 0.5);
+    deltaAngle = currentAngle - lastAngle;
+    lastAngle = currentAngle;
+    logoRotation += degrees(deltaAngle);
+    }
   // Check if we're dragging the "logo"
   if (dragging) {
     logoX += mouseX - prevMouseX;
     logoY += mouseY - prevMouseY;
-    
     // Update previous mouse positions
     prevMouseX = mouseX;
     prevMouseY = mouseY;
   }
+  
 }
 
 //
-void scaffoldControlLogic()
-{
+void scaffoldControlLogic(){
   float controlAreaCenterX = width/2; // Center X for the controls area
   float controlAreaY = height - inchToPix(1f); // Y position for all controls, set to near the bottom of the screen
   float controlSpacing = inchToPix(1f); // Space between each control
@@ -229,12 +300,29 @@ void mousePressed()
     startTime = millis();
     println("time started!");
   }
-  
+
+  float d = dist(mouseX, mouseY, width * 0.5, height-border);
+  if (d < 50) {
+    rotating = true;
+    lastAngle = atan2(mouseY - height+border, mouseX - width * 0.5);
+  }
+  // if click on the slider
+  if (dist(mouseX, mouseY, sliderX, sliderKnobY) < inchToPix(0.4f)) {
+    sliderDragging = true;
+  }
   // Check if the mouse is inside the "logo" rectangle upon pressing
   if (dist(mouseX, mouseY, logoX, logoY) < logoZ / 2) {
     dragging = true;
     prevMouseX = mouseX;
     prevMouseY = mouseY;
+  }
+}
+void mouseDragged() {
+  if (sliderDragging) {
+    // Update nob position basing on with mouse action
+    sliderKnobY = constrain(mouseY, sliderY, sliderY + sliderHeight);
+    // update logo rotation value 
+    logoZ = map(sliderKnobY, sliderY, sliderY + sliderHeight,inchToPix(3f),inchToPix(0.25f));
   }
 }
 
@@ -254,8 +342,10 @@ void mouseReleased()
       finishTime = millis();
     }
   }
+  sliderDragging = false;
+  rotating = false;
   dragging = false;
-}
+  }
 
 //probably shouldn't modify this, but email me if you want to for some good reason.
 public boolean checkForSuccess()
