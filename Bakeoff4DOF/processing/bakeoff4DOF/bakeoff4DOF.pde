@@ -11,11 +11,17 @@ float errorPenalty = 0.5f; //for every error, add this value to mean time
 int startTime = 0; // time starts when the first click is captured
 int finishTime = 0; //records the time of the final click
 boolean userDone = false; //is the user done
+// variables for submit button
+boolean isSubmitButtonPressed = false;
+float submitButtonX = width * 0.95;
+float submitButtonY = height * 0.9;
+float submitButtonWidth = inchToPix(1.0f);
+float submitButtonHeight = inchToPix(0.5f);
 
 final int screenPPI = 72; //what is the DPI of the screen you are using
 //you can test this by drawing a 72x72 pixel rectangle in code, and then confirming with a ruler it is 1x1 inch. 
 
-boolean isSubmitButtonPressed = false;
+
 
 //These variables are for my example design. Your input code should modify/replace these!
 float logoX = 500;
@@ -75,7 +81,7 @@ void draw() {
     text("User took " + ((finishTime-startTime)/1000f/trialCount+(errorCount*errorPenalty)) + " sec per destination inc. penalty", width/2, inchToPix(.4f)*4);
     return;
   }
-
+  
   //===========DRAW DESTINATION SQUARES=================
   for (int i=trialIndex; i<trialCount; i++) // reduces over time
   {
@@ -92,123 +98,101 @@ void draw() {
     rect(0, 0, d.z, d.z);
     popMatrix();
   }
+  if (checkForSuccess()) {
+    background(0, 70, 0);
+  }
 
   //===========DRAW LOGO SQUARE=================
   pushMatrix();
   translate(logoX, logoY); //translate draw center to the center oft he logo square
-  rotate(radians(logoRotation)); //rotate using the logo square as the origin
+  rotate(logoRotation); //rotate using the logo square as the origin
   noStroke();
   fill(60, 60, 192, 192);
   rect(0, 0, logoZ, logoZ);
   popMatrix();
-
-  //===========DRAW EXAMPLE CONTROLS=================
-  fill(255);
-  scaffoldControlLogic(); //you are going to want to replace this!
-  text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchToPix(.8f));
   
- drawSubmitButton();
+  text("Trial " + (trialIndex+1) + " of " +trialCount, width/2, inchToPix(.8f));
+  drawSubmitButton();
 }
+
 void drawSubmitButton() {
  
-  float submitButtonX = width * 0.85; 
-  float submitButtonY = height * 0.8;
+  float submitButtonX = width * 0.95; 
+  float submitButtonY = height * 0.9;
   float submitButtonWidth = inchToPix(1.0f); 
   float submitButtonHeight = inchToPix(0.5f);
-
   fill(128);
-  rect(submitButtonX , submitButtonY , submitButtonWidth, submitButtonHeight);
+  
+  // Check if the mouse is over the button
+  if (mouseX > submitButtonX - submitButtonWidth / 2 -40&& 
+      mouseX < submitButtonX + submitButtonWidth / 2 -40&&
+      mouseY > submitButtonY - submitButtonHeight / 2 -20&& 
+      mouseY < submitButtonY + submitButtonHeight / 2-20) {
+    fill(255, 0, 0); // Highlight color, e.g., red
+  } else {
+    fill(128); // Default button color
+  }
+  rect(submitButtonX-submitButtonWidth/2 , submitButtonY-submitButtonHeight/2 , submitButtonWidth, submitButtonHeight);
   
   fill(0);
   textAlign(CENTER, CENTER);
-  text("Submit", submitButtonX, submitButtonY);
+  text("Submit", submitButtonX-submitButtonWidth/2, submitButtonY-submitButtonHeight/2);
+
 }
 
 //my example design for control, which is terrible
-void scaffoldControlLogic()
-{
-  //upper left corner, rotate counterclockwise
-  text("CCW", inchToPix(.4f), inchToPix(.4f));
-  if (mousePressed && dist(0, 0, mouseX, mouseY)<inchToPix(.8f))
-    logoRotation--;
 
-  //upper right corner, rotate clockwise
-  text("CW", width-inchToPix(.4f), inchToPix(.4f));
-  if (mousePressed && dist(width, 0, mouseX, mouseY)<inchToPix(.8f))
-    logoRotation++;
-
-  //lower left corner, decrease Z
-  text("-", inchToPix(.4f), height-inchToPix(.4f));
-  if (mousePressed && dist(0, height, mouseX, mouseY)<inchToPix(.8f))
-    logoZ = constrain(logoZ-inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone!
-
-  //lower right corner, increase Z
-  text("+", width-inchToPix(.4f), height-inchToPix(.4f));
-  if (mousePressed && dist(width, height, mouseX, mouseY)<inchToPix(.8f))
-    logoZ = constrain(logoZ+inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone! 
-
-  //left middle, move left
-  text("left", inchToPix(.4f), height/2);
-  if (mousePressed && dist(0, height/2, mouseX, mouseY)<inchToPix(.8f))
-    logoX-=inchToPix(.02f);
-
-  text("right", width-inchToPix(.4f), height/2);
-  if (mousePressed && dist(width, height/2, mouseX, mouseY)<inchToPix(.8f))
-    logoX+=inchToPix(.02f);
-
-  text("up", width/2, inchToPix(.4f));
-  if (mousePressed && dist(width/2, 0, mouseX, mouseY)<inchToPix(.8f))
-    logoY-=inchToPix(.02f);
-
-  text("down", width/2, height-inchToPix(.4f));
-  if (mousePressed && dist(width/2, height, mouseX, mouseY)<inchToPix(.8f))
-    logoY+=inchToPix(.02f);
-}
 
 void mousePressed()
 {
+  submitButtonX = width * 0.95;
+  submitButtonY = height * 0.9;
+  submitButtonWidth = inchToPix(1.0f);
+  submitButtonHeight = inchToPix(0.5f);
   if (startTime == 0) //start time on the instant of the first user click
   {
     startTime = millis();
     println("time started!");
   }
+ 
+  else if (inSubmit()) {
+      submit();
+  }
 }
-
-void mouseReleased()
+Boolean inSubmit() 
 {
-  float submitButtonX = width * 0.85;
-  float submitButtonY = height * 0.8;
-  float submitButtonWidth = inchToPix(1.0f);
-  float submitButtonHeight = inchToPix(0.5f);
-  if (mouseX > submitButtonX  && mouseX < submitButtonX + submitButtonWidth &&
-      mouseY > submitButtonY  && mouseY < submitButtonY + submitButtonHeight) {
-    
-    submit();
+  if (dist(submitButtonX-40, submitButtonY-20, mouseX, mouseY)<inchToPix(.4f)) {
+      return true;
   }
+  return false;
 }
+
 void submit() {
-  if (userDone == false && !checkForSuccess())
+  if (userDone == false && !checkForSuccess()){
     errorCount++;
-
-  trialIndex++; //
-
-  if (trialIndex == trialCount && userDone == false) {
-    userDone = true;
-    finishTime = millis();
+    }
+    trialIndex++; //and move on to next trial
+  
+    if (trialIndex==trialCount && userDone==false)
+    {
+      userDone = true;
+      finishTime = millis();
+    }
   }
-}
+
 //probably shouldn't modify this, but email me if you want to for some good reason.
 public boolean checkForSuccess()
 {
-  Destination d = destinations.get(trialIndex);	
+  Destination d = destinations.get(trialIndex);  
   boolean closeDist = dist(d.x, d.y, logoX, logoY)<inchToPix(.05f); //has to be within +-0.05"
-  boolean closeRotation = calculateDifferenceBetweenAngles(d.rotation, logoRotation)<=5;
-  boolean closeZ = abs(d.z - logoZ)<inchToPix(.1f); //has to be within +-0.1"	
+  boolean closeRotation = calculateDifferenceBetweenAngles(d.rotation, logoRotation*180/PI)<=5;
+  boolean closeZ = abs(d.z - logoZ)<inchToPix(.1f); //has to be within +-0.1"  
 
   println("Close Enough Distance: " + closeDist + " (logo X/Y = " + d.x + "/" + d.y + ", destination X/Y = " + logoX + "/" + logoY +")");
-  println("Close Enough Rotation: " + closeRotation + " (rot dist="+calculateDifferenceBetweenAngles(d.rotation, logoRotation)+")");
+  println("Close Enough Rotation: " + closeRotation + " (rot dist="+calculateDifferenceBetweenAngles(d.rotation, logoRotation*180/PI)+")");
   println("Close Enough Z: " +  closeZ + " (logo Z = " + d.z + ", destination Z = " + logoZ +")");
   println("Close enough all: " + (closeDist && closeRotation && closeZ));
+
 
   return closeDist && closeRotation && closeZ;
 }
@@ -223,6 +207,12 @@ double calculateDifferenceBetweenAngles(float a1, float a2)
   else
     return diff;
 }
+
+//double calculateDifferenceBetweenAngles(float a1, float a2)
+//{
+//  double diff=abs(a1%360-a2%360);
+//  return diff;
+//}
 
 //utility function to convert inches into pixels based on screen PPI
 float inchToPix(float inch)
