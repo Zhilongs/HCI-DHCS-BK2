@@ -18,7 +18,12 @@ final int screenPPI = 72; //what is the DPI of the screen you are using
 // mouse dragging variables
 boolean dragging = false;
 float prevMouseX, prevMouseY;
-
+// variables for submit button
+boolean isSubmitButtonPressed = false;
+float submitButtonX = width * 0.95;
+float submitButtonY = height * 0.9;
+float submitButtonWidth = inchToPix(1.0f);
+float submitButtonHeight = inchToPix(0.5f);
 
 //These variables are for my example design. Your input code should modify/replace these!
 float logoX = 500;
@@ -94,6 +99,9 @@ void draw() {
       stroke(128, 128, 128, 128); //set color to semi translucent
     rect(0, 0, d.z, d.z);
     popMatrix();
+    if (checkForSuccess()) {
+    background(0, 70, 0);
+  }
   }
 
   //===========DRAW LOGO SQUARE=================
@@ -131,8 +139,29 @@ void draw() {
     prevMouseX = mouseX;
     prevMouseY = mouseY;
   }
+  drawSubmitButton();
 }
-
+void drawSubmitButton() {
+  float submitButtonX = width * 0.95; 
+  float submitButtonY = height * 0.9;
+  float submitButtonWidth = inchToPix(1.0f); 
+  float submitButtonHeight = inchToPix(0.5f);
+  fill(128);
+  // Check if the mouse is over the button
+  if (mouseX > submitButtonX - submitButtonWidth / 2 -40&& 
+      mouseX < submitButtonX + submitButtonWidth / 2 -40&&
+      mouseY > submitButtonY - submitButtonHeight / 2 -20&& 
+      mouseY < submitButtonY + submitButtonHeight / 2-20) {
+    fill(255, 0, 0); // Highlight color, e.g., red
+  } else {
+    fill(128); // Default button color
+  }
+  rect(submitButtonX-submitButtonWidth/2 , submitButtonY-submitButtonHeight/2 , submitButtonWidth, submitButtonHeight);
+  
+  fill(0);
+  textAlign(CENTER, CENTER);
+  text("Submit", submitButtonX-submitButtonWidth/2, submitButtonY-submitButtonHeight/2);
+}
 //my example design for control, which is terrible
 void scaffoldControlLogic()
 {
@@ -173,9 +202,19 @@ void scaffoldControlLogic()
   if (mousePressed && dist(width/2, height, mouseX, mouseY)<inchToPix(.8f))
     logoY+=inchToPix(.02f);
 }
+Boolean inSubmit() 
+{ if (dist(submitButtonX-40, submitButtonY-20, mouseX, mouseY)<inchToPix(.4f)) {
+      return true;
+  }
+  return false;
+}
 
 void mousePressed()
 {
+   submitButtonX = width * 0.95;
+  submitButtonY = height * 0.9;
+  submitButtonWidth = inchToPix(1.0f);
+  submitButtonHeight = inchToPix(0.5f);
   if (startTime == 0) //start time on the instant of the first user click
   {
     startTime = millis();
@@ -188,11 +227,13 @@ void mousePressed()
     prevMouseX = mouseX;
     prevMouseY = mouseY;
   }
+  else if (inSubmit()) {
+      submit();
+  }
 }
 
-void mouseReleased()
-{
-  //check to see if user clicked middle of screen within 3 inches, which this code uses as a submit button
+void submit(){
+   //check to see if user clicked middle of screen within 3 inches, which this code uses as a submit button
   if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(0.5f))
   {
     if (userDone==false && !checkForSuccess())
@@ -206,6 +247,11 @@ void mouseReleased()
       finishTime = millis();
     }
   }
+}
+
+void mouseReleased()
+{
+ 
   dragging = false;
 }
 
