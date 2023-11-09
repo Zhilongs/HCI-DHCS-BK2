@@ -138,7 +138,7 @@ void scaffoldControlLogic()
 {
   float controlAreaCenterX = width/2; // Center X for the controls area
   float controlAreaY = height - inchToPix(1f); // Y position for all controls, set to near the bottom of the screen
-  float controlSpacing = inchToPix(1f); // Space between each control
+  float controlSpacing = inchToPix(0.55f); // Space between each control
   
   // Control positions
   float ccwX = controlAreaCenterX - controlSpacing * 2; // Counterclockwise button X position
@@ -153,58 +153,93 @@ void scaffoldControlLogic()
   float upY = controlAreaY - controlSpacing; // Move up button Y position
   float downY = controlAreaY + controlSpacing; // Move down button Y position
 
-  float buttonWidth = inchToPix(0.8f);  //
-  float buttonHeight = inchToPix(0.6f); //
+  /*float buttonWidth = inchToPix(0.8f);  //
+  float buttonHeight = inchToPix(0.6f);*/ //
+  
+  float buttonWidth = inchToPix(0.5f);  //
+  float buttonHeight = inchToPix(0.5f);
+  
   // Rotate counterclockwise button
-  fill(128); 
+  /*fill(255); 
   rect(ccwX , controlAreaY , buttonWidth, buttonHeight);
   fill(0); 
   text("CCW", ccwX, controlAreaY);
   if (mousePressed && dist(ccwX, controlAreaY, mouseX, mouseY)<inchToPix(.4f))
+    logoRotation--;*/
+    
+  fill(255); 
+  rect(minusX , controlAreaY , buttonWidth, buttonHeight);
+  fill(0); 
+  textSize(14); 
+  text("CCW", minusX , controlAreaY+5);
+  if (mousePressed && dist(minusX , controlAreaY, mouseX, mouseY)<inchToPix(.4f))
     logoRotation--;
 
   // Rotate clockwise button
-  fill(128); 
+  /*fill(255); 
   rect(cwX , controlAreaY , buttonWidth, buttonHeight);
   fill(0); 
   text("CW", cwX, controlAreaY);
   if (mousePressed && dist(cwX, controlAreaY, mouseX, mouseY)<inchToPix(.4f))
+    logoRotation++;*/
+    
+  fill(255); 
+  rect(plusX , controlAreaY , buttonWidth, buttonHeight);
+  fill(0); 
+  text("CW", plusX , controlAreaY+5);
+  if (mousePressed && dist(plusX , controlAreaY , mouseX, mouseY)<inchToPix(.4f))
     logoRotation++;
 
   // Decrease Z button
-  fill(128); 
+  /*fill(255); 
   rect(minusX , controlAreaY , buttonWidth, buttonHeight);
   fill(0); 
   text("-", minusX, controlAreaY);
   if (mousePressed && dist(minusX, controlAreaY, mouseX, mouseY)<inchToPix(.4f))
-    logoZ = constrain(logoZ-inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone!
+    logoZ = constrain(logoZ-inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone!*/
+    
+  fill(255); 
+  rect(controlAreaCenterX, downY , buttonWidth, buttonHeight);
+  fill(0); 
+  textSize(24); 
+  text("-", controlAreaCenterX, downY+5);
+  if (mousePressed && dist(controlAreaCenterX, downY, mouseX, mouseY)<inchToPix(.4f))
+  logoZ = constrain(logoZ-inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone!
 
   // Increase Z button
-  fill(128); 
+  /*fill(255); 
   rect(plusX , controlAreaY , buttonWidth, buttonHeight);
   fill(0); 
   text("+", plusX, controlAreaY);
   if (mousePressed && dist(plusX, controlAreaY, mouseX, mouseY)<inchToPix(.4f))
-    logoZ = constrain(logoZ+inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone! 
+    logoZ = constrain(logoZ+inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone! */
+    
+  fill(255); 
+  rect(controlAreaCenterX, upY , buttonWidth, buttonHeight);
+  fill(0); 
+  textSize(24); 
+  text("+", controlAreaCenterX, upY+5);
+  if (mousePressed && dist(controlAreaCenterX, upY, mouseX, mouseY)<inchToPix(.4f))
+    logoZ = constrain(logoZ+inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone!
 
   // Move left button
-  fill(128); 
+  /*fill(128); 
   rect(leftX , controlAreaY , buttonWidth, buttonHeight);
   fill(0);
   text("left", leftX, controlAreaY);
   if (mousePressed && dist(leftX, controlAreaY, mouseX, mouseY)<inchToPix(.4f))
-    logoX-=inchToPix(.02f);
+    logoX-=inchToPix(.02f);*/
 
   // Move right button
-  fill(128); 
+  /*fill(128); 
   rect(rightX, controlAreaY , buttonWidth, buttonHeight);
   fill(0);
   text("right", rightX, controlAreaY);
   if (mousePressed && dist(rightX, controlAreaY, mouseX, mouseY)<inchToPix(.4f))
-    logoX+=inchToPix(.02f);
+    logoX+=inchToPix(.02f);*/
 
   // Move up button, positioned above the CCW and "-" buttons
-  fill(128); 
+  /*fill(128); 
   rect(controlAreaCenterX, upY , buttonWidth, buttonHeight);
   fill(0);
   text("up", controlAreaCenterX, upY);
@@ -217,7 +252,7 @@ void scaffoldControlLogic()
   fill(0);
   text("down", controlAreaCenterX, downY);
   if (mousePressed && dist(controlAreaCenterX, downY, mouseX, mouseY)<inchToPix(.4f))
-    logoY+=inchToPix(.02f);
+    logoY+=inchToPix(.02f);*/
 }
 
 void mousePressed()
