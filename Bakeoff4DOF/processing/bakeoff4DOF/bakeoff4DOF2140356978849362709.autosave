@@ -12,6 +12,12 @@ int startTime = 0; // time starts when the first click is captured
 int finishTime = 0; //records the time of the final click
 boolean userDone = false; //is the user done
 
+boolean isSubmitButtonPressed = false;
+float submitButtonX = width * 0.95;
+float submitButtonY = height * 0.9;
+float submitButtonWidth = inchToPix(1.0f);
+float submitButtonHeight = inchToPix(0.5f);
+
 final int screenPPI = 72; //what is the DPI of the screen you are using
 //you can test this by drawing a 72x72 pixel rectangle in code, and then confirming with a ruler it is 1x1 inch. 
 
@@ -19,11 +25,7 @@ final int screenPPI = 72; //what is the DPI of the screen you are using
 boolean dragging = false;
 float prevMouseX, prevMouseY;
 
-boolean isSubmitButtonPressed = false;
-float submitButtonX = width * 0.95;
-float submitButtonY = height * 0.9;
-float submitButtonWidth = inchToPix(1.0f);
-float submitButtonHeight = inchToPix(0.5f);
+
 //These variables are for my example design. Your input code should modify/replace these!
 float logoX = 500;
 float logoY = 500;
@@ -135,33 +137,6 @@ void draw() {
     prevMouseX = mouseX;
     prevMouseY = mouseY;
   }
-  
- drawSubmitButton();
-}
-void drawSubmitButton() {
-
-  float submitButtonX = width * 0.95; 
-  float submitButtonY = height * 0.9;
-  float submitButtonWidth = inchToPix(1.0f); 
-  float submitButtonHeight = inchToPix(0.5f);
-  fill(255);
-
-  // Check if the mouse is over the button
-  if (mouseX > submitButtonX - submitButtonWidth / 2 -40&& 
-      mouseX < submitButtonX + submitButtonWidth / 2 -40&&
-      mouseY > submitButtonY - submitButtonHeight / 2 -20&& 
-      mouseY < submitButtonY + submitButtonHeight / 2-20) {
-    fill(255, 0, 0); // Highlight color, e.g., red
-  } else {
-    fill(255); // Default button color
-  }
-  rect(submitButtonX-submitButtonWidth/2 , submitButtonY-submitButtonHeight/2 , submitButtonWidth, submitButtonHeight);
-
-  fill(0);
-  textAlign(CENTER, CENTER);
-  textSize(20);
-  text("Submit", submitButtonX-submitButtonWidth/2, submitButtonY-submitButtonHeight/2);
-
 }
 
 //
@@ -203,7 +178,7 @@ void scaffoldControlLogic()
   fill(0); 
   textSize(14); 
   text("CCW", minusX , controlAreaY+5);
-  if (mousePressed && !dragging && dist(minusX , controlAreaY, mouseX, mouseY)<inchToPix(.4f))
+  if (mousePressed && dist(minusX , controlAreaY, mouseX, mouseY)<inchToPix(.4f))
     logoRotation--;
 
   // Rotate clockwise button
@@ -218,7 +193,7 @@ void scaffoldControlLogic()
   rect(plusX , controlAreaY , buttonWidth, buttonHeight);
   fill(0); 
   text("CW", plusX , controlAreaY+5);
-  if (mousePressed && !dragging && dist(plusX , controlAreaY , mouseX, mouseY)<inchToPix(.4f))
+  if (mousePressed && dist(plusX , controlAreaY , mouseX, mouseY)<inchToPix(.4f))
     logoRotation++;
 
   // Decrease Z button
@@ -234,7 +209,7 @@ void scaffoldControlLogic()
   fill(0); 
   textSize(24); 
   text("-", controlAreaCenterX, downY+5);
-  if (mousePressed && !dragging && dist(controlAreaCenterX, downY, mouseX, mouseY)<inchToPix(.4f))
+  if (mousePressed && dist(controlAreaCenterX, downY, mouseX, mouseY)<inchToPix(.4f))
   logoZ = constrain(logoZ-inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone!
 
   // Increase Z button
@@ -250,7 +225,7 @@ void scaffoldControlLogic()
   fill(0); 
   textSize(24); 
   text("+", controlAreaCenterX, upY+5);
-  if (mousePressed && !dragging && dist(controlAreaCenterX, upY, mouseX, mouseY)<inchToPix(.4f))
+  if (mousePressed && dist(controlAreaCenterX, upY, mouseX, mouseY)<inchToPix(.4f))
     logoZ = constrain(logoZ+inchToPix(.02f), .01, inchToPix(4f)); //leave min and max alone!
 
   // Move left button
@@ -288,10 +263,6 @@ void scaffoldControlLogic()
 
 void mousePressed()
 {
-  submitButtonX = width * 0.95;
-  submitButtonY = height * 0.9;
-  submitButtonWidth = inchToPix(1.0f);
-  submitButtonHeight = inchToPix(0.5f);
   if (startTime == 0) //start time on the instant of the first user click
   {
     startTime = millis();
@@ -304,35 +275,27 @@ void mousePressed()
     prevMouseX = mouseX;
     prevMouseY = mouseY;
   }
-
- else if (inSubmit()) {
-      submit();
-  }
 }
 
-Boolean inSubmit() 
-{
-  if (dist(submitButtonX-40, submitButtonY-20, mouseX, mouseY)<inchToPix(.4f)) {
-      return true;
-  }
-  return false; 
-}
 void mouseReleased()
 {
+  //check to see if user clicked middle of screen within 3 inches, which this code uses as a submit button
+  if (dist(width/2, height/2, mouseX, mouseY)<inchToPix(3f))
+  {
+    if (userDone==false && !checkForSuccess())
+      errorCount++;
 
+    trialIndex++; //and move on to next trial
+
+    if (trialIndex==trialCount && userDone==false)
+    {
+      userDone = true;
+      finishTime = millis();
+    }
+  }
   dragging = false;
 }
-void submit() {
-  if (userDone == false && !checkForSuccess())
-    errorCount++;
 
-  trialIndex++; //
-
-  if (trialIndex == trialCount && userDone == false) {
-    userDone = true;
-    finishTime = millis();
-  }
-}
 //probably shouldn't modify this, but email me if you want to for some good reason.
 public boolean checkForSuccess()
 {
